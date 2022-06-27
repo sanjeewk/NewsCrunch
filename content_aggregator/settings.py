@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'podcasts.apps.PodcastsConfig',
+    'news.apps.NewsConfig',
         # Third Party Apps
     "django_apscheduler",
 
