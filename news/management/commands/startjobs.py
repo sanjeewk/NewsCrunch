@@ -14,12 +14,9 @@ from django_apscheduler.jobstores import DjangoJobStore
 from django_apscheduler.models import DjangoJobExecution
 
 # Models
-from podcasts.models import Episode
 from news.models import Article
-from news import scrape
 
-import requests
-import news.summarization as summarization
+
 logger = logging.getLogger(__name__)
 
 
@@ -48,8 +45,6 @@ def save_new_episodes(feed):
             )
             episode.save()
 
-# def save_new_article(feed):
-
 
 def fetch_realpython_episodes():
     """Fetches new episodes from RSS for the Real Python Podcast."""
@@ -57,39 +52,15 @@ def fetch_realpython_episodes():
     save_new_episodes(_feed)
 
 
+def fetch_talkpython_episodes():
+    """Fetches new episodes from RSS for the Talk Python to Me Podcast."""
+    _feed = feedparser.parse("https://talkpython.fm/episodes/rss")
+    save_new_episodes(_feed)
+
 
 def delete_old_job_executions(max_age=604_800):
     """Deletes all apscheduler job execution logs older than `max_age`."""
     DjangoJobExecution.objects.delete_old_job_executions(max_age)
-
-def fetch_reuters_episodes():
-    query_params = {
-    "source": "reuters",
-    "sortBy": "top",
-    "apiKey": "f58a31b8ccdb449f8bf038a5fac6282e"
-    }
-    main_url = " https://newsapi.org/v1/articles"
-
-    # fetching data in json format
-    res = requests.get(main_url, params=query_params)
-    open_bbc_page = res.json()
-
-    # getting all articles in a string article
-    article = open_bbc_page["articles"]
-
-    # empty list which will
-    # contain all trending news
-    results = []
-
-    for ar in article:
-        print(ar['url'])
-        try:
-            a = scrape.get_reuters_text(ar['url'])
-            a = " ".join(a)
-            print(summarization.abstract_summary(a))
-        except:
-            print("article unable")
-        results.append(ar["title"])
 
 
 class Command(BaseCommand):
@@ -111,14 +82,14 @@ class Command(BaseCommand):
         logger.info("Added job: The Real Python Podcast.")
 
         scheduler.add_job(
-            fetch_reuters_episodes,
+            fetch_talkpython_episodes,
             trigger="interval",
             minutes=1440,
             id="Talk Python Feed",
             max_instances=1,
             replace_existing=True,
         )
-        logger.info("Added job: Reuters Feed.")
+        logger.info("Added job: Talk Python Feed.")
 
         scheduler.add_job(
             delete_old_job_executions,

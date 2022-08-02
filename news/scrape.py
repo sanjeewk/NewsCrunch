@@ -11,9 +11,6 @@ def get_bbc_text(url:str) -> list:
     text = [p.text for p in body.find_all("p")] 
     return text
 
-import requests
-from bs4 import BeautifulSoup as bs
-
 def get_reuters_text(url:str) -> list:
     article = requests.get(url)
     soup = bs(article.content, "html.parser")
