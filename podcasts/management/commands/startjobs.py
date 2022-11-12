@@ -1,6 +1,7 @@
 # Standard Library
 import logging
-
+from os import link
+#TODO 
 # Django
 from django.conf import settings
 from django.core.management.base import BaseCommand
@@ -48,8 +49,17 @@ def save_new_episodes(feed):
             )
             episode.save()
 
-# def save_new_article(feed):
-
+def save_new_article(data, source):
+    """saves article to database"""
+    article = Article(
+        title=data["title"],
+        summarised_text=data['text'],
+        pub_date=data['publishedAt'],
+        link=data['url'],
+        author=data['author'],
+        publisher=source
+    )
+    article.save()
 
 def fetch_realpython_episodes():
     """Fetches new episodes from RSS for the Real Python Podcast."""
@@ -72,24 +82,22 @@ def fetch_reuters_episodes():
 
     # fetching data in json format
     res = requests.get(main_url, params=query_params)
-    open_bbc_page = res.json()
+    reuters_data = res.json()
 
-    # getting all articles in a string article
-    article = open_bbc_page["articles"]
+    headlines= reuters_data["articles"]
 
-    # empty list which will
-    # contain all trending news
-    results = []
-
-    for ar in article:
-        print(ar['url'])
+    for headline in headlines:
+        print(headline['url'])
         try:
-            a = scrape.get_reuters_text(ar['url'])
-            a = " ".join(a)
-            print(summarization.abstract_summary(a))
+            article = scrape.get_reuters_text(headline['url'])
+            article = " ".join(article)
+            # print(summarization.abstract_summary(a))
+            txt = summarization.abstract_summary(article)
+            headline['text'] = txt
         except:
             print("article unable")
-        results.append(ar["title"])
+        print(headline)
+        save_new_article(headline, source="reuters")
 
 
 class Command(BaseCommand):
@@ -99,21 +107,21 @@ class Command(BaseCommand):
         scheduler = BlockingScheduler(timezone=settings.TIME_ZONE)
         scheduler.add_jobstore(DjangoJobStore(), "default")
 
-        scheduler.add_job(
-            fetch_realpython_episodes,
-            trigger="interval",
-            minutes=2,
-            id="The Real Python Podcast",  # Each job MUST have a unique ID
-            max_instances=1,
-            # Replaces existing and stops duplicates on restart of the app.
-            replace_existing=True,
-        )
-        logger.info("Added job: The Real Python Podcast.")
+        # scheduler.add_job(
+        #     fetch_realpython_episodes,
+        #     trigger="interval",
+        #     minutes=2,
+        #     id="The Real Python Podcast",  # Each job MUST have a unique ID
+        #     max_instances=1,
+        #     # Replaces existing and stops duplicates on restart of the app.
+        #     replace_existing=True,
+        # )
+        # logger.info("Added job: The Real Python Podcast.")
 
         scheduler.add_job(
             fetch_reuters_episodes,
             trigger="interval",
-            minutes=1440,
+            minutes=1,
             id="Talk Python Feed",
             max_instances=1,
             replace_existing=True,
