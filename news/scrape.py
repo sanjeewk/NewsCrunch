@@ -20,3 +20,13 @@ def get_reuters_text(url:str) -> list:
     text = [p.text for p in body.find_all("p")] 
     return text
 
+def get_ap_text(url:str) -> list:
+    article = requests.get(url)
+    soup = bs(article.content, "html.parser")
+    # print(soup)
+    body = soup.find(class_ = "Article")
+    # body = soup.find(class_="text__text__1FZLe text__dark-grey__3Ml43 text__medium__1kbOh text__heading_2__1K_hh heading__base__2T28j heading__heading_2__3Fcw5")
+    text = [p.text for p in body.find_all("p")] 
+    return text
+
+

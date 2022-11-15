@@ -99,6 +99,44 @@ def fetch_reuters_episodes():
         print(headline)
         save_new_article(headline, source="reuters")
 
+def fetch_ap_episodes():
+    query_params = {
+    "source": "associated-press",
+    "sortBy": "top",
+    "apiKey": "f58a31b8ccdb449f8bf038a5fac6282e"
+    }
+    main_url = " https://newsapi.org/v1/articles"
+
+    # fetching data in json format
+    res = requests.get(main_url, params=query_params)
+    reuters_data = res.json()
+
+    headlines= reuters_data["articles"]
+
+    for headline in headlines:
+        print(headline['url'])
+        try:
+            article = scrape.get_ap_text(headline['url'])
+            article = " ".join(article)
+            # print(summarization.abstract_summary(a))
+            txt = summarization.abstract_summary(article)
+            headline['text'] = txt
+        except:
+            print("article unable")
+        print(headline)
+        save_new_article(headline, source="ap")
+
+
+class Command(BaseCommand):
+    help = "Runs apscheduler."
+
+    def handle(self, *args, **options):
+        scheduler = BlockingScheduler(timezone=settings.TIME_ZONE)
+        scheduler.add_jobstore(DjangoJobStore(), "default")
+
+        # scheduler.add_job(
+        #     fetch_realpython_e
+
 
 class Command(BaseCommand):
     help = "Runs apscheduler."
