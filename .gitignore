@@ -1,2 +1,6 @@
-.venv
-__pycache__/
+podcasts/
+db.sqlite3
+*.pyc
+.venv/
+test*
+podcasts/management/commands/__pycache__/startjobs.cpython-39.pyc

@@ -1,6 +1,7 @@
 from spacy.lang.en.stop_words import STOP_WORDS
 from sklearn.feature_extraction.text import CountVectorizer
 import en_core_web_sm
+from transformers import AutoTokenizer, AutoModelForSeq2SeqLM, pipeline
 nlp = en_core_web_sm.load()
 
 def extractive_summary(text):
@@ -8,7 +9,8 @@ def extractive_summary(text):
     # text = ""
     # for t in ta:
     #     text +=t
-
+    # print(text)
+    # print("===================================================")
     doc = nlp(text)
 
     corpus = [sent.text.lower() for sent in doc.sents ]
@@ -35,12 +37,12 @@ def extractive_summary(text):
                 else:
                     sentence_rank[sent]=word_frequency[word.text.lower()]
     top_sentences=(sorted(sentence_rank.values())[::-1])
-    top_sent=top_sentences[:5]
+    top_sent=top_sentences[:8]
 
     summary=""
     for sent,strength in sentence_rank.items():  
         if strength in top_sent:
-            summary.append(sent)
+            summary += str(sent) + " "
         else:
             continue
     # for i in summary:
@@ -49,3 +51,6 @@ def extractive_summary(text):
     return summary
 
 def abstractive_summary(text:str):
+    tokenizer = AutoTokenizer.from_pretrained("mrm8488/bert-small2bert-small-finetuned-cnn_daily_mail-summarization")
+    model = AutoModelForSeq2SeqLM.from_pretrained("mrm8488/bert-small2bert-small-finetuned-cnn_daily_mail-summarization")
+ 

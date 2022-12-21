@@ -15,39 +15,14 @@ from django_apscheduler.jobstores import DjangoJobStore
 from django_apscheduler.models import DjangoJobExecution
 
 # Models
-from podcasts.models import Episode
 from news.models import Article
 from news import scrape
 
 import requests
 import news.summarization as summarization
 logger = logging.getLogger(__name__)
-
-
-def save_new_episodes(feed):
-    """Saves new episodes to the database.
-
-    Checks the episode GUID agaist the episodes currently stored in the
-    database. If not found, then a new `Episode` is added to the database.
-
-    Args:
-        feed: requires a feedparser object
-    """
-    podcast_title = feed.channel.title
-    podcast_image = feed.channel.image["href"]
-
-    for item in feed.entries:
-        if not Episode.objects.filter(guid=item.guid).exists():
-            episode = Episode(
-                title=item.title,
-                description=item.description,
-                pub_date=parser.parse(item.published),
-                link=item.link,
-                image=podcast_image,
-                podcast_name=podcast_title,
-                guid=item.guid,
-            )
-            episode.save()
+tokenizer = AutoTokenizer.from_pretrained("mrm8488/bert-small2bert-small-finetuned-cnn_daily_mail-summarization")
+model = AutoModelForSeq2SeqLM.from_pretrained("mrm8488/bert-small2bert-small-finetuned-cnn_daily_mail-summarization")
 
 def save_new_article(data, source):
     """saves article to database"""
@@ -74,8 +49,7 @@ def fetch_reuters_articles():
     }
     main_url = " https://newsapi.org/v1/articles"
     
-    tokenizer = AutoTokenizer.from_pretrained("mrm8488/bert-small2bert-small-finetuned-cnn_daily_mail-summarization")
-    model = AutoModelForSeq2SeqLM.from_pretrained("mrm8488/bert-small2bert-small-finetuned-cnn_daily_mail-summarization")
+
 
     sum = pipeline(task="summarization", model=model, tokenizer=tokenizer)
     # fetching data in json format
@@ -91,7 +65,8 @@ def fetch_reuters_articles():
         # print(summarization.extractive_summary(a))
         txt = summarization.extractive_summary(article)
         print(txt)
-        txt = sum(txt)
+        print('-------------------------------------------')
+        txt = sum(txt)[0]
         print(txt)
         headline['text'] = txt['summary_text']
         # except:
