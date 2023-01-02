@@ -4,27 +4,47 @@
     {% load static %}
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>pyCasts!</title>
+    <title>News</title>
     <link
       rel="stylesheet"
       href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
       integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z"
       crossorigin="anonymous"
     />
+    <style> @import url('https://fonts.googleapis.com/css2?family=Cardo&family=Josefin+Sans:wght@300&display=swap'); </style>
     <link rel="stylesheet" href="{% static 'main.css' %}" />
   </head>
   <body class="d-flex flex-column">
-    <div>banana</div>
+  <container>
+    <nav class="navbar navbar-expand-lg navbar-light" style="background-color: #e3f2fd;">
+      <!-- <a class="navbar-brand" href="#">NewsCrunch</a> -->
+      <a class="blog-header-logo text-dark" href="#">NewsCrunch</a> 
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+        <div class="navbar-nav">
+          <a class="nav-item nav-link active" href="#">Home <span class="sr-only">(current)</span></a>
+          <a class="nav-item nav-link" href="#">Features</a>
+          <a class="nav-item nav-link" href="#">Pricing</a>
+          <a class="nav-item nav-link disabled" href="#">Disabled</a>
+        </div>
+      </div>
+    </nav>
+
+<container class="mt-5">
 {% for sub_article in articles %}
     {% if forloop.first %}<div class="row">{% endif %}
     <div class="col-sm">
 
-            <h5>{{sub_article.title}}</h5>
+            <h5>{{sub_article.publisher}} : {{sub_article.title}}</h5>
             <p>{{sub_article.summarised_text}}</p>
         </div>
     {% if forloop.counter|divisibleby:3 %}</div><div class="row">{% endif %}
     {% if forloop.last %}</div>{% endif %}
 {% endfor %}
+    </container>
 
+  </container>
 </body>
 </html>
