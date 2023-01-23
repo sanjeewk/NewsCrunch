@@ -1,3 +1,4 @@
+from pydoc import text
 from spacy.lang.en.stop_words import STOP_WORDS
 from sklearn.feature_extraction.text import CountVectorizer
 import en_core_web_sm
@@ -53,4 +54,19 @@ def extractive_summary(text):
 def abstractive_summary(text:str):
     tokenizer = AutoTokenizer.from_pretrained("mrm8488/bert-small2bert-small-finetuned-cnn_daily_mail-summarization")
     model = AutoModelForSeq2SeqLM.from_pretrained("mrm8488/bert-small2bert-small-finetuned-cnn_daily_mail-summarization")
- 
+
+from nltk import tokenize
+
+def grammar_check(original_text:str, summarised_text:str) -> str:
+    summarised_text = summarised_text.replace(" ' ", "'")
+    summarised_text = summarised_text.replace("$ ", "$")
+    sentences = tokenize.sent_tokenize(summarised_text)
+    sentences = [sent.capitalize() for sent in sentences]
+
+    print(sentences)
+    #TODO: compare with original text
+    return summarised_text
+
+if __name__ == "__main__":
+    tst = "goldman sachs group inc ' s asset management arm will significantly reduce the $ 59 billion of alternative investments. the positions included $ 15 billion in equity investments, $ 19 billion in loans and $ 12 billion in debt securities. investors are also showing interest in private equity funds and are looking to buy positions in the secondary market."
+    print(grammar_check(tst,tst))
