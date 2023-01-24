@@ -1,11 +1,12 @@
 # Standard Library
 import logging
 from os import link
+from turtle import title
 from transformers import AutoTokenizer, AutoModelForSeq2SeqLM, pipeline
 # Django
 from django.conf import settings
 from django.core.management.base import BaseCommand
-
+import json
 # Third Party
 import feedparser
 from dateutil import parser
@@ -19,10 +20,11 @@ from news.models import Article
 from news import scrape
 
 import requests
-import news.summarization as summarization
+from news.summarization import Summariser
 logger = logging.getLogger(__name__)
 tokenizer = AutoTokenizer.from_pretrained("mrm8488/bert-small2bert-small-finetuned-cnn_daily_mail-summarization")
 model = AutoModelForSeq2SeqLM.from_pretrained("mrm8488/bert-small2bert-small-finetuned-cnn_daily_mail-summarization")
+
 
 def save_new_article(data, source):
     """saves article to database"""
@@ -36,12 +38,12 @@ def save_new_article(data, source):
     )
     article.save()
 
-
 def delete_old_job_executions(max_age=604_800):
     """Deletes all apscheduler job execution logs older than `max_age`."""
     DjangoJobExecution.objects.delete_old_job_executions(max_age)
 
-def fetch_reuters_articles():
+def fetch_reuters_articles(summary):
+    print("fetchhhhhh")
     query_params = {
     "source": "reuters",
     "sortBy": "top",
@@ -49,30 +51,32 @@ def fetch_reuters_articles():
     }
     main_url = " https://newsapi.org/v1/articles"
     
-
-
     sum = pipeline(task="summarization", model=model, tokenizer=tokenizer)
     # fetching data in json format
     res = requests.get(main_url, params=query_params)
     reuters_data = res.json()
-
+    print(json.dumps(reuters_data))
+    if "articles" not in reuters_data:
+        return
     headlines= reuters_data["articles"][:5]
     for headline in headlines:
         # print(headline['url'])
         # try:
-        article = scrape.get_reuters_text(headline['url'])
-        article = " ".join(article)
-        # print(summarization.extractive_summary(a))
-        txt = summarization.extractive_summary(article)
-        print(txt)
-        print('-------------------------------------------')
-        txt = sum(txt)[0]
-        print(txt)
-        headline['text'] = txt['summary_text']
+        if not Article.objects.filter(title=headline["title"]).exists():
+            article = scrape.get_reuters_text(headline['url'])
+            article = " ".join(article)
+
+            # txt = summarization.extractive_summary(article)
+            # txt = sum(txt)[0]
+            # print("txt1" , txt)
+            # print('-------------------------------------------')
+
+            # headline['text'] = summarization.grammar_check(" ", txt['summary_text'])
+            headline['text'] = summary(article)
+            
+            save_new_article(headline, source="Reuters")
         # except:
         #     print("article unable")
-        # print(headline)
-        save_new_article(headline, source="reuters")
 
 def fetch_ap_articles():
     query_params = {
@@ -90,28 +94,39 @@ def fetch_ap_articles():
 
     for headline in headlines:
         # print(headline['url'])
-        try:
+        # try:
+        if not Article.objects.filter(title=headline["title"]).exists():
             article = scrape.get_ap_text(headline['url'])
+
             article = " ".join(article)
-            # print(summarization.extractive_summary(a))
             txt = summarization.extractive_summary(article)
-            headline['text'] = txt
-        except:
-            print("article unable")
+
+            print("-----------------------")
+            print("AP ", txt)
+            txt = sum(str(txt))[0]
+
+            # print(txt)
+            headline['text'] = txt['summary_text']
+            save_new_article(headline, source="ap")
+        # except:
+        #     print("article unable")
         # print(headline)
-        save_new_article(headline, source="ap")
 
 
 
 class Command(BaseCommand):
     help = "Runs apscheduler."
+    def __init__(self, stdout=None, stderr=None, no_color=False):
+        super().__init__(stdout, stderr, no_color)
+        self.summary = Summariser()
 
     def handle(self, *args, **options):
         scheduler = BlockingScheduler(timezone=settings.TIME_ZONE)
         scheduler.add_jobstore(DjangoJobStore(), "default")
-
+        a=(55)
         scheduler.add_job(
             fetch_reuters_articles,
+            args=[(self.summary)],
             trigger="interval",
             minutes=1,
             id="Reuters articles",
@@ -123,12 +138,11 @@ class Command(BaseCommand):
         # scheduler.add_job(
         #     fetch_ap_articles,
         #     trigger="interval",
-        #     minutes=1,
-        #     id="Talk Python Feed",
+        #     minutes=2,
+        #     id="AP articles",
         #     max_instances=1,
         #     replace_existing=True,
         # )
-        # logger.info("Added job: Fetch AP Feed.")
 
         scheduler.add_job(
             delete_old_job_executions,

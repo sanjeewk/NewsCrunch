@@ -13,8 +13,9 @@ Color Palette: https://coolors.co/e63946-f1faee-a8dadc-457b9d-1d3557
 }
 
 body {
-  margin-left: 10%;
-  margin-right: 10%;
+  /* margin-left: 10%;
+  margin-right: 10%; */
+  /* padding: 0 5%; */
   min-height: 100vh;
   background-color: var(--off-white);
   /* background-color: var(--space); */
@@ -23,8 +24,18 @@ body {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif,
     "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
 }
+container{
+  /* display: block; */
+  width: 100%;
+  padding-right: 15px;
+    padding-left: 15px;
+  margin-right: auto;
+  margin-left: auto;
+  /* margin-right: 10%; */
+  /* margin-left: 10%; */
+}
 nav{
-  font-size: large;
+  /* font-size: large; */
   color: #e63946;
 }
 .navbar-brand{
@@ -35,7 +46,7 @@ nav{
   font-family: "Playfair Display", Georgia, "Times New Roman", serif;
   font-family: "Cardo";
   font-size: 2.25rem;
-  padding-right: 2rem;
+  /* padding-right: 2rem; */
 }
 a {
   color: var(--red);
@@ -54,9 +65,9 @@ p{
   font-size: 15px;
 }
 nav{
-  padding-left: 5rem;
-  font-size: 20px;
-  margin-bottom: 3rem;
+  /* padding-left: 5rem; */
+  font-size: 16px;
+  /* margin-bottom: 3rem; */
 }
 footer {
   padding: 1em;
