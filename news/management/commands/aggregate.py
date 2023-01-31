@@ -42,7 +42,8 @@ def delete_old_job_executions(max_age=604_800):
     """Deletes all apscheduler job execution logs older than `max_age`."""
     DjangoJobExecution.objects.delete_old_job_executions(max_age)
 
-def fetch_reuters_articles(summary):
+def fetch_reuters_articles():
+    summary = Summariser()
     print("fetchhhhhh")
     query_params = {
     "source": "reuters",
@@ -119,16 +120,15 @@ class Command(BaseCommand):
     def __init__(self, stdout=None, stderr=None, no_color=False):
         super().__init__(stdout, stderr, no_color)
         self.summary = Summariser()
-
+            # args=[(self.summary)],
     def handle(self, *args, **options):
         scheduler = BlockingScheduler(timezone=settings.TIME_ZONE)
         scheduler.add_jobstore(DjangoJobStore(), "default")
-        a=(55)
         scheduler.add_job(
             fetch_reuters_articles,
-            args=[(self.summary)],
+
             trigger="interval",
-            minutes=1,
+            minutes=2,
             id="Reuters articles",
             max_instances=1,
             replace_existing=True,
