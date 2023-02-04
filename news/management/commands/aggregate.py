@@ -46,71 +46,64 @@ def fetch_reuters_articles():
     summary = Summariser()
     print("fetchhhhhh")
     query_params = {
-    "source": "reuters",
-    "sortBy": "top",
-    "apiKey": "f58a31b8ccdb449f8bf038a5fac6282e"
+    "source" : "reuters",
+    "sortBy" : "top",
+    "apiKey" : "f58a31b8ccdb449f8bf038a5fac6282e",
     }
     main_url = " https://newsapi.org/v1/articles"
     
-    sum = pipeline(task="summarization", model=model, tokenizer=tokenizer)
     # fetching data in json format
     res = requests.get(main_url, params=query_params)
     reuters_data = res.json()
-    print(json.dumps(reuters_data))
+    # print(json.dumps(reuters_data))
     if "articles" not in reuters_data:
         return
-    headlines= reuters_data["articles"][:5]
+    headlines= reuters_data["articles"][:7]
     for headline in headlines:
         # print(headline['url'])
         # try:
-        if not Article.objects.filter(title=headline["title"]).exists():
+        if not Article.objects.filter(title=headline["title"]).exists() and "Explainer:" not in headline["title"]:
+
             article = scrape.get_reuters_text(headline['url'])
             article = " ".join(article)
-
-            # txt = summarization.extractive_summary(article)
-            # txt = sum(txt)[0]
-            # print("txt1" , txt)
-            # print('-------------------------------------------')
-
-            # headline['text'] = summarization.grammar_check(" ", txt['summary_text'])
             headline['text'] = summary(article)
             
             save_new_article(headline, source="Reuters")
         # except:
         #     print("article unable")
 
-def fetch_ap_articles():
-    query_params = {
-    "source": "associated-press",
-    "sortBy": "top",
-    "apiKey": "f58a31b8ccdb449f8bf038a5fac6282e"
-    }
-    main_url = " https://newsapi.org/v1/articles"
+# def fetch_ap_articles():
+#     query_params = {
+#     "source": "associated-press",
+#     "sortBy": "top",
+#     "apiKey": "f58a31b8ccdb449f8bf038a5fac6282e"
+#     }
+#     main_url = " https://newsapi.org/v1/articles"
 
-    # fetching data in json format
-    res = requests.get(main_url, params=query_params)
-    ap_data = res.json()
+#     # fetching data in json format
+#     res = requests.get(main_url, params=query_params)
+#     ap_data = res.json()
 
-    headlines= ap_data["articles"][:5]
+#     headlines= ap_data["articles"][:5]
 
-    for headline in headlines:
-        # print(headline['url'])
-        # try:
-        if not Article.objects.filter(title=headline["title"]).exists():
-            article = scrape.get_ap_text(headline['url'])
+#     for headline in headlines:
+#         # print(headline['url'])
+#         # try:
+#         if not Article.objects.filter(title=headline["title"]).exists():
+#             article = scrape.get_ap_text(headline['url'])
 
-            article = " ".join(article)
-            txt = summarization.extractive_summary(article)
+#             article = " ".join(article)
+#             txt = summarization.extractive_summary(article)
 
-            print("-----------------------")
-            print("AP ", txt)
-            txt = sum(str(txt))[0]
+#             print("-----------------------")
+#             print("AP ", txt)
+#             txt = sum(str(txt))[0]
 
-            # print(txt)
-            headline['text'] = txt['summary_text']
-            save_new_article(headline, source="ap")
-        # except:
-        #     print("article unable")
+#             # print(txt)
+#             headline['text'] = txt['summary_text']
+#             save_new_article(headline, source="ap")
+#         # except:
+#         #     print("article unable")
         # print(headline)
 
 

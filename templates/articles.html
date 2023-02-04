@@ -15,6 +15,9 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Alegreya+Sans+SC:ital,wght@1,500&family=Cardo&family=Josefin+Sans:wght@300&display=swap" rel="stylesheet">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Space+Mono&display=swap');
+</style>
     <link rel="stylesheet" href="{% static 'main.css' %}" />
   </head>
   <body class="d-flex flex-column">
@@ -57,7 +60,13 @@
 
   <div class=container>
     <h2>Summarised World News</h2>
-    <p>Summary</p>
+    <!-- <p>Summary</p> -->
+  <ul>
+    {% for article in summary %}
+    <li><div class="summary-headline">{{article.publisher}} : {{article.title}}</div>{{article.summarised_text}}</li>
+    {% endfor %}
+  </ul>
+
   </div>
   <div class="container mt-1">
   {% for sub_article in articles %}

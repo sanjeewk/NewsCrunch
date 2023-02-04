@@ -87,7 +87,7 @@ class Summariser:
         for word in summarised_words:
             if word not in original_words:
                 if word.capitalize() in original_words:
-                    summarised_text = summarised_text.replace(word, word.capitalize())
+                    summarised_text = summarised_text.replace(" "+word, " "+word.capitalize())
                 if word.upper() in original_words:
                     summarised_text = summarised_text.replace(word, word.upper())
             # else:
