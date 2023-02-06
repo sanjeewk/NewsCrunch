@@ -1,9 +1,10 @@
 from pydoc import text
-from spacy.lang.en.stop_words import STOP_WORDS
+#from spacy.lang.en.stop_words import STOP_WORDS
 from sklearn.feature_extraction.text import CountVectorizer
 import en_core_web_sm
 from transformers import AutoTokenizer, AutoModelForSeq2SeqLM, pipeline
 from nltk import tokenize
+STOP_WORDS = ['via', 'but', 'latter', 'not', 'then', 'upon', 'whom', 'a', 'also', 'some', 'give', 'put', 'used', 'last', 'bottom', 'anyhow', 'among', 'hereby', 'sometimes', 'seem', 'ever', 'never', 'full', 'are', 'anyone', 'made', 'beside', 'during', 'while', 'must', 'somewhere', 'anything', 'too', 'it', 'now', 'thereupon', 'thereby', 'serious', "'s", 'though', 'doing', 'more', 'whereupon', 'top', '’m', 'as', 'this', 'amongst', 'and', 'again', 'other', 'nothing', 'we', 'yet', 'call', 'would', '’re', 'that', 'into', 'therefore', 'elsewhere', 'down', 'should', 'everywhere', 'something', 'here', 'thru', 'just', 'these', 'hers', 'herein', 'everything', 'former', 'be', 'alone', 'take', 'third', 'see', 'whenever', 'another', 'below', 'often', 'using', 'move', 'formerly', 'were', 'which', 'one', 'less', "'re", 'either', 'becoming', 'himself', 'somehow', 'still', 'otherwise', 'nobody', 'seeming', 'is', 'off', 'your', 'yours', 'n’t', 'toward', 'being', 'up', 'make', 'whereafter', 'what', 'any', 'by', 'the', "'ve", 'do', 'because', 'go', 'show', 'own', 'sixty', 'eleven', '‘re', 'can', '‘ve', '’d', 'five', 'noone', 'before', 'ours', 'say', 'since', 'first', 'yourself', '‘s', 'back', 'will', 'really', 'why', 'those', 'therein', 'nevertheless', 'fifty', 'our', 'hereafter', 'to', 'whose', 'or', 'n‘t', 'always', 'ourselves', 'done', 'else', 'hence', 'on', 'its', 'every', 'me', 'throughout', 'whole', 'someone', 'twenty', 'per', 'how', 'themselves', 'his', 'keep', "'m", 'ten', 'without', '’ll', 'no', 'beforehand', 'myself', 'wherein', 'does', 'i', 'hundred', 'from', 'becomes', 'besides', 'against', 'yourselves', 'thereafter', 'about', 'none', 'with', 'together', 'until', "'ll", 'few', 'almost', 'itself', "'d", 'across', 'due', 'anywhere', 'became', 'next', 'in', 'although', 'above', 'side', 'whether', 'everyone', '’ve', 'seems', 'my', 'nowhere', 'two', 'whatever', 'twelve', 'ca', 'namely', 're', 'you', 'amount', 'further', 'under', 'anyway', 'may', 'when', 'cannot', 'sometime', 'six', '‘ll', 'where', 'regarding', 'except', 'than', 'same', 'all', 'various', 'them', 'even', "n't", 'after', 'there', 'have', 'quite', 'was', 'only', 'whereas', 'very', 'whence', 'whoever', 'over', 'an', 'once', 'around', 'beyond', 'empty', 'within', 'perhaps', 'forty', 'much', 'both', 'least', 'nor', 'herself', 'name', 'wherever', 'meanwhile', 'each', 'latterly', 'mostly', 'moreover', 'such', 'rather', 'front', 'us', 'indeed', 'thus', 'well', 'for', 'unless', 'behind', 'so', 'has', 'if', 'could', 'several', 'become', 'nine', 'enough', 'through', 'she', 'many', 'her', 'whereby', 'might', 'whither', 'thence', 'he', 'mine', 'had', 'three', 'fifteen', 'am', 'afterwards', 'of', 'eight', 'most', 'who', 'between', '‘m', 'out', 'part', 'along', 'they', 'however', 'towards', 'neither', 'did', '’s', 'been', 'onto', 'get', '‘d', 'at', 'four', 'others', 'their', 'seemed', 'him', 'please', 'hereupon', 'already']
 
 # python -m spacy download en_core_web_sm
 #  nltk.download('punkt')
@@ -23,7 +24,7 @@ class Summariser:
     def extractive_summary(self, text):
         doc = self.nlp(text)
         corpus = [sent.text.lower() for sent in doc.sents ]
-        cv = CountVectorizer(stop_words=list(STOP_WORDS))   
+        cv = CountVectorizer(stop_words=STOP_WORDS)   
         cv_fit=cv.fit_transform(corpus)    
         word_list = cv.get_feature_names_out();    
         count_list = cv_fit.toarray().sum(axis=0)

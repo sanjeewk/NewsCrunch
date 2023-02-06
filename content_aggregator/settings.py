@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-45z6od)d6v$_m_$4!r+u%%=6l@g@ru7m#%8ldr@^vn%$qm!6k$
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -79,18 +79,10 @@ WSGI_APPLICATION = 'content_aggregator.wsgi.application'
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
 DATABASES = {
-    # 'default': {
-    #     'ENGINE': 'django.db.backends.sqlite3',
-    #     'NAME': BASE_DIR / 'db.sqlite3',
-    # },
-    'default': {
-    'ENGINE': 'django.db.backends.postgresql_psycopg2',
-    'NAME': 'project_database',
-    'USER': 'admin',
-    'PASSWORD': 'Admin123',
-    'HOST': 'localhost',
-    'PORT': ''  
-} 
+     'default': {
+         'ENGINE': 'django.db.backends.sqlite3',
+         'NAME': BASE_DIR / 'db.sqlite3',
+     }
 }
 
 
@@ -131,10 +123,10 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
 STATIC_URL = '/static/'
-STATICFILES_DIRS = [
-    BASE_DIR / "static",
-]
-
+#STATICFILES_DIRS = [
+#    BASE_DIR / "static",
+#]
+STATIC_ROOT = "/home/sanjeewk/content_aggregator/static"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field

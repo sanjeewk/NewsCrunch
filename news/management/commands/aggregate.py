@@ -1,7 +1,6 @@
 # Standard Library
 import logging
 from os import link
-from turtle import title
 from transformers import AutoTokenizer, AutoModelForSeq2SeqLM, pipeline
 # Django
 from django.conf import settings
