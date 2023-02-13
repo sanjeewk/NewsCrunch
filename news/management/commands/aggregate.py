@@ -118,9 +118,9 @@ class Command(BaseCommand):
         scheduler.add_jobstore(DjangoJobStore(), "default")
         scheduler.add_job(
             fetch_reuters_articles,
-
-            trigger="interval",
-            minutes=2,
+            trigger = CronTrigger(year="*", month="*", day="*", hour="13", minute="0"),
+            #trigger="interval",
+            #minutes=2,
             id="Reuters articles",
             max_instances=1,
             replace_existing=True,
