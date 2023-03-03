@@ -69,11 +69,10 @@ class Summariser:
         summarised_text = summarised_text.replace("$ ", "$")
         summarised_text = summarised_text.replace(" %", "%")
         summarised_text = summarised_text.replace("( ", "(")
-        summarised_text = summarised_text.replace(") ", ")")
+        summarised_text = summarised_text.replace(" )", ")")
         sentences = tokenize.sent_tokenize(summarised_text)
         sentences = [sent.capitalize() for sent in sentences]
         summarised_text = " ".join(sentences)
-        #TODO: compare with original text
         or_t = self.nlp(original_text)
         sum_t = self.nlp(summarised_text)
 
