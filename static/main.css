@@ -25,8 +25,9 @@ body {
     "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
     font-family: 'Space Mono', monospace;
 }
-header{
-  background-color: rgb(219, 211, 211);
+
+header {
+  background-color: rgba(47, 255, 118, 0.91);
 }
 container{
   /* display: block; */
@@ -54,9 +55,9 @@ container{
   font-size: 3rem;
   /* padding-right: 2rem; */
 }
-a {
+/* a {
   color: var(--red);
-}
+} */
 h5 {
   text-decoration-line: underline;
   text-decoration-thickness: inherit;
