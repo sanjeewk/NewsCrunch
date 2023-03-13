@@ -62,7 +62,7 @@
     {% for article in summary %}
     <!-- <li> -->
     <div class="summary"> 
-      <div class="summary-headline">{{article.publisher}} : {{article.title}}</div>
+      <div class="summary-headline"><a href={{article.link}} target="_blank">{{article.publisher}} : {{article.title}}</a></div>
      <p> {{article.summarised_text}}</p>
     </div>
     <!-- </li> -->
