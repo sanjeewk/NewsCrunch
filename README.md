@@ -1,6 +1,6 @@
 <div align="center">
 <h1  style="display: block; font-size: 2.5em; font-weight: bold;"> <br /><br /><strong>NewsCrunch</strong> </h1>
-<img src="images/capture.PNG" width="780">
+<img src="images/Capture.PNG" width="780">
 <h1></h1>
 </div>
 
