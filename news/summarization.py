@@ -55,9 +55,6 @@ class Summariser:
                 summary += str(sent) + " "
             else:
                 continue
-        # for i in summary:
-        #     print(i,end=" ")
-        #     print("\n")
         return summary
 
     def abstractive_summary(self, text:str):

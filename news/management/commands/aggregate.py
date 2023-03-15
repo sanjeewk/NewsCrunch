@@ -56,13 +56,13 @@ def fetch_reuters_articles():
     reuters_data = res.json()
     # print(json.dumps(reuters_data))
     if "articles" not in reuters_data:
+        print("no articles")
         return
     headlines= reuters_data["articles"][:7]
     for headline in headlines:
         # print(headline['url'])
         # try:
-        if not Article.objects.filter(title=headline["title"]).exists() and "Explainer:" not in headline["title"]:
-
+        if Article.objects.filter(title=headline["title"]).exists() and "Explainer:" not in headline["title"]:
             article = scrape.get_reuters_text(headline['url'])
             article = " ".join(article)
             headline['text'] = summary(article)
@@ -118,9 +118,9 @@ class Command(BaseCommand):
         scheduler.add_jobstore(DjangoJobStore(), "default")
         scheduler.add_job(
             fetch_reuters_articles,
-            trigger = CronTrigger(year="*", month="*", day="*", hour="13", minute="0"),
-            #trigger="interval",
-            #minutes=2,
+            # trigger = CronTrigger(year="*", month="*", day="*", hour="13", minute="0"),
+            trigger="interval",
+            minutes=2,
             id="Reuters articles",
             max_instances=1,
             replace_existing=True,
