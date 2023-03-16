@@ -7,7 +7,6 @@ from django.conf import settings
 from django.core.management.base import BaseCommand
 import json
 # Third Party
-import feedparser
 from dateutil import parser
 from apscheduler.schedulers.blocking import BlockingScheduler
 from apscheduler.triggers.cron import CronTrigger
@@ -24,7 +23,16 @@ logger = logging.getLogger(__name__)
 tokenizer = AutoTokenizer.from_pretrained("mrm8488/bert-small2bert-small-finetuned-cnn_daily_mail-summarization")
 model = AutoModelForSeq2SeqLM.from_pretrained("mrm8488/bert-small2bert-small-finetuned-cnn_daily_mail-summarization")
 
+import spacy
+nlp = spacy.load('en_core_web_md')
 
+def similarity_check(headlines, title):
+    title = nlp(title)
+    for headline in headlines:
+        if headline.similarity(title)>0.8:
+            return False        
+    return True
+    
 def save_new_article(data, source):
     """saves article to database"""
     article = Article(
@@ -42,6 +50,8 @@ def delete_old_job_executions(max_age=604_800):
     DjangoJobExecution.objects.delete_old_job_executions(max_age)
 
 def fetch_reuters_articles():
+    past_headlines = Article.objects.filter().order_by("-pub_date")[:10]
+    past_headlines = [nlp(headline.title) for headline in past_headlines]
     summary = Summariser()
     print("fetchhhhhh")
     query_params = {
@@ -62,7 +72,7 @@ def fetch_reuters_articles():
     for headline in headlines:
         # print(headline['url'])
         # try:
-        if Article.objects.filter(title=headline["title"]).exists() and "Explainer:" not in headline["title"]:
+        if  "Explainer:" not in headline["title"] and similarity_check(past_headlines, headline["title"]):
             article = scrape.get_reuters_text(headline['url'])
             article = " ".join(article)
             headline['text'] = summary(article)

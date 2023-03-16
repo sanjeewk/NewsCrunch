@@ -1,9 +1,15 @@
 <div align="center">
+
 <h1  style="display: block; font-size: 2.5em; font-weight: bold;"> <br /><br /><strong>NewsCrunch</strong> </h1>
+<a href="https://sanjeewk.pythonanywhere.com/">
 <img src="images/Capture.PNG" width="780">
+</a>
 <h1></h1>
 </div>
 
+<a href="https://sanjeewk.pythonanywhere.com/">
+<h3>Live demo</h3>
+</a>
 
 NewsCrunch is an application to scrape articles from news sites and use a combination of NLP methods to present condensed versions of the daily top stories.
 
