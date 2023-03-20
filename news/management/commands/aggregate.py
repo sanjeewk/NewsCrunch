@@ -25,11 +25,15 @@ model = AutoModelForSeq2SeqLM.from_pretrained("mrm8488/bert-small2bert-small-fin
 
 import spacy
 nlp = spacy.load('en_core_web_md')
+summary = Summariser()
 
 def similarity_check(headlines, title):
+    if Article.objects.filter(title=title).exists():
+        return False
     title = nlp(title)
     for headline in headlines:
         if headline.similarity(title)>0.8:
+            print(f"{title} is too similar to {headline}")
             return False        
     return True
     
@@ -52,8 +56,9 @@ def delete_old_job_executions(max_age=604_800):
 def fetch_reuters_articles():
     past_headlines = Article.objects.filter().order_by("-pub_date")[:10]
     past_headlines = [nlp(headline.title) for headline in past_headlines]
-    summary = Summariser()
-    print("fetchhhhhh")
+
+    print("Fetching Reuters articles")
+
     query_params = {
     "source" : "reuters",
     "sortBy" : "top",
@@ -70,52 +75,49 @@ def fetch_reuters_articles():
         return
     headlines= reuters_data["articles"][:7]
     for headline in headlines:
-        # print(headline['url'])
-        # try:
         if  "Explainer:" not in headline["title"] and similarity_check(past_headlines, headline["title"]):
             article = scrape.get_reuters_text(headline['url'])
             article = " ".join(article)
             headline['text'] = summary(article)
             
             save_new_article(headline, source="Reuters")
-        # except:
-        #     print("article unable")
-
-# def fetch_ap_articles():
-#     query_params = {
-#     "source": "associated-press",
-#     "sortBy": "top",
-#     "apiKey": "f58a31b8ccdb449f8bf038a5fac6282e"
-#     }
-#     main_url = " https://newsapi.org/v1/articles"
-
-#     # fetching data in json format
-#     res = requests.get(main_url, params=query_params)
-#     ap_data = res.json()
-
-#     headlines= ap_data["articles"][:5]
-
-#     for headline in headlines:
-#         # print(headline['url'])
-#         # try:
-#         if not Article.objects.filter(title=headline["title"]).exists():
-#             article = scrape.get_ap_text(headline['url'])
-
-#             article = " ".join(article)
-#             txt = summarization.extractive_summary(article)
-
-#             print("-----------------------")
-#             print("AP ", txt)
-#             txt = sum(str(txt))[0]
-
-#             # print(txt)
-#             headline['text'] = txt['summary_text']
-#             save_new_article(headline, source="ap")
-#         # except:
-#         #     print("article unable")
-        # print(headline)
 
 
+def fetch_ap_articles():
+    print("Fetching AP articles")
+    query_params = {
+    "source": "associated-press",
+    "sortBy": "top",
+    "apiKey": "f58a31b8ccdb449f8bf038a5fac6282e"
+    }
+    main_url = " https://newsapi.org/v1/articles"
+    
+    past_headlines = Article.objects.filter().order_by("-pub_date")[:10]
+    past_headlines = [nlp(headline.title) for headline in past_headlines]
+
+    # fetching data in json format
+    res = requests.get(main_url, params=query_params)
+    ap_data = res.json()
+
+    headlines= ap_data["articles"][:5]
+
+    for headline in headlines:
+        # print(headline['url'])
+        # try:
+        if similarity_check(past_headlines, headline["title"]):
+
+            article = scrape.get_ap_text(headline['url'])
+            if not article:
+                return
+            
+            article = " ".join(article)
+            headline['text'] = summary(article)
+            
+            save_new_article(headline, source="AP")
+
+def fetch_news():
+    fetch_reuters_articles()
+    fetch_ap_articles()
 
 class Command(BaseCommand):
     help = "Runs apscheduler."
@@ -127,24 +129,15 @@ class Command(BaseCommand):
         scheduler = BlockingScheduler(timezone=settings.TIME_ZONE)
         scheduler.add_jobstore(DjangoJobStore(), "default")
         scheduler.add_job(
-            fetch_reuters_articles,
+            fetch_news,
             # trigger = CronTrigger(year="*", month="*", day="*", hour="13", minute="0"),
             trigger="interval",
             minutes=2,
-            id="Reuters articles",
+            id="Fetch articles",
             max_instances=1,
             replace_existing=True,
         )
         logger.info("Added job: Fetch Reuters Feed.")
-
-        # scheduler.add_job(
-        #     fetch_ap_articles,
-        #     trigger="interval",
-        #     minutes=2,
-        #     id="AP articles",
-        #     max_instances=1,
-        #     replace_existing=True,
-        # )
 
         scheduler.add_job(
             delete_old_job_executions,

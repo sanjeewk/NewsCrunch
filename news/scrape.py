@@ -22,10 +22,13 @@ def get_reuters_text(url:str) -> list:
 
 def get_ap_text(url:str) -> list:
     article = requests.get(url)
+    # print(article.content)
     soup = bs(article.content, "html.parser")
+    # print("="*10)
     # print(soup)
-    body = soup.find(class_ = "Article")
-    text = [p.text for p in body.find_all("p")] 
-    return text
+    body = soup.find(class_ = "Article") # sometimes article 
+    if body:
+        text = [p.text for p in body.find_all("p")] 
+        return text
 
 
