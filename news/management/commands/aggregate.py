@@ -24,7 +24,7 @@ tokenizer = AutoTokenizer.from_pretrained("mrm8488/bert-small2bert-small-finetun
 model = AutoModelForSeq2SeqLM.from_pretrained("mrm8488/bert-small2bert-small-finetuned-cnn_daily_mail-summarization")
 
 import spacy
-nlp = spacy.load('en_core_web_md')
+nlp = spacy.load('en_core_web_sm')
 summary = Summariser()
 
 def similarity_check(headlines, title):
@@ -130,9 +130,9 @@ class Command(BaseCommand):
         scheduler.add_jobstore(DjangoJobStore(), "default")
         scheduler.add_job(
             fetch_news,
-            # trigger = CronTrigger(year="*", month="*", day="*", hour="13", minute="0"),
-            trigger="interval",
-            minutes=2,
+            trigger = CronTrigger(year="*", month="*", day="*", hour="13", minute="0"),
+            # trigger="interval",
+            # minutes=2,
             id="Fetch articles",
             max_instances=1,
             replace_existing=True,
